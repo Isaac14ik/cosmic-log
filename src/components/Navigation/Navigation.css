@@ -10,3 +10,8 @@
   color: #ffffff;
   text-decoration: none;
 }
+
+.navigation__link_active {
+  border-bottom: 2px solid #ffffff;
+  font-weight: bold;
+}

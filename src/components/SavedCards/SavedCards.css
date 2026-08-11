@@ -1,0 +1,14 @@
+.saved-cards {
+  padding: 40px 20px;
+  text-align: center;
+  min-height: calc(100vh - 160px);
+}
+
+.saved-cards__title {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.saved-cards__subtitle {
+  color: #aaaaaa;
+}
