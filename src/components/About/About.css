@@ -1,4 +1,29 @@
 .about {
   padding: 40px 20px;
   text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.about__title {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #4a90e2;
+}
+
+.about__name {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.about__role {
+  font-size: 16px;
+  color: #aaa;
+  margin-bottom: 15px;
+}
+
+.about__description {
+  line-height: 1.6;
+  color: #ddd;
 }
