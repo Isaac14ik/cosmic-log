@@ -1,0 +1,13 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background-color: rgba(11, 13, 23, 0.8);
+  border-bottom: 1px solid #222;
+}
+
+.header__title {
+  margin: 0;
+  font-size: 24px;
+}
