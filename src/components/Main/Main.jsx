@@ -1,13 +1,17 @@
 import React from 'react';
-import About from '../About/About';
+import SearchForm from '../SearchForm/SearchForm';
 import Preloader from '../Preloader/Preloader';
+import NotFound from '../NotFound/NotFound';
+import About from '../About/About';
 import './Main.css';
 
 function Main() {
   return (
     <main className="main">
-      <h2>Bienvenido al Bitácora Espacial</h2>
+      <SearchForm />
+      {/* Estos componentes se mostrarán condicionalmente más adelante con la lógica de la API */}
       <Preloader />
+      <NotFound />
       <About />
     </main>
   );
