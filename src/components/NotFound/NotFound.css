@@ -2,9 +2,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
   text-align: center;
+  padding: 60px 20px;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .not-found__icon {
@@ -13,15 +14,14 @@
 }
 
 .not-found__title {
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 700;
   color: #ffffff;
+  margin-bottom: 12px;
 }
 
-.not-found__subtitle {
+.not-found__text {
   font-size: 16px;
   color: #b6c2d0;
-  max-width: 360px;
   line-height: 1.4;
 }

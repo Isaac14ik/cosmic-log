@@ -4,8 +4,8 @@ import './Preloader.css';
 function Preloader() {
   return (
     <div className="preloader">
-      <div className="preloader__spinner"></div>
-      <p className="preloader__text">Buscando en la galaxia...</p>
+      <div className="preloader__circle"></div>
+      <p className="preloader__text">Buscando noticias en el cosmos...</p>
     </div>
   );
 }
