@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Header from '../Header/Header';
 import Main from '../Main/Main';
+import SavedCards from '../SavedCards/SavedCards';
 import Footer from '../Footer/Footer';
 import PopupWithForm from '../PopupWithForm/PopupWithForm';
 import './App.css';
@@ -27,7 +29,13 @@ function App() {
   return (
     <div className="page">
       <Header onLoginClick={handleOpenLogin} />
-      <Main />
+      
+      {/* Definición de Rutas */}
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="/saved-cards" element={<SavedCards />} />
+      </Routes>
+
       <Footer />
 
       {/* Modal de Iniciar Sesión */}
@@ -41,7 +49,6 @@ function App() {
         onRedirectClick={handleOpenRegister}
         onSubmit={(e) => {
           e.preventDefault();
-          console.log('Iniciando sesión...');
           closeAllPopups();
         }}
       >
@@ -76,7 +83,6 @@ function App() {
         onRedirectClick={handleOpenLogin}
         onSubmit={(e) => {
           e.preventDefault();
-          console.log('Registrando usuario...');
           closeAllPopups();
         }}
       >

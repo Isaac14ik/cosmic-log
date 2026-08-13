@@ -1,32 +1,31 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './Navigation.css';
 
-function Navigation() {
+function Navigation({ onLoginClick }) {
+  const location = useLocation();
+
   return (
     <nav className="navigation">
-      <ul className="navigation__list">
-        <li className="navigation__item">
-          <NavLink 
-            to="/" 
-            className={({ isActive }) => 
-              isActive ? "navigation__link navigation__link_active" : "navigation__link"
-            }
-          >
-            Inicio
-          </NavLink>
-        </li>
-        <li className="navigation__item">
-          <NavLink 
-            to="/saved-cards" 
-            className={({ isActive }) => 
-              isActive ? "navigation__link navigation__link_active" : "navigation__link"
-            }
-          >
-            Guardados
-          </NavLink>
-        </li>
-      </ul>
+      <Link 
+        to="/" 
+        className={`navigation__link ${location.pathname === '/' ? 'navigation__link_active' : ''}`}
+      >
+        Inicio
+      </Link>
+      <Link 
+        to="/saved-cards" 
+        className={`navigation__link ${location.pathname === '/saved-cards' ? 'navigation__link_active' : ''}`}
+      >
+        Bitácora
+      </Link>
+      <button 
+        type="button" 
+        className="navigation__button" 
+        onClick={onLoginClick}
+      >
+        Inicia sesión
+      </button>
     </nav>
   );
 }

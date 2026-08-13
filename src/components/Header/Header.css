@@ -1,13 +1,25 @@
 .header {
+  width: 100%;
+  background-color: rgba(11, 13, 23, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
-  background-color: rgba(11, 13, 23, 0.8);
-  border-bottom: 1px solid #222;
 }
 
-.header__title {
-  margin: 0;
+.header__logo {
   font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
 }
