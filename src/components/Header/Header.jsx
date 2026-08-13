@@ -1,14 +1,11 @@
-import React from 'react';
-import Navigation from '../Navigation/Navigation';
-import './Header.css';
-
-function Header() {
+// fragmento en Header.jsx:
+function Header({ onLoginClick }) {
   return (
     <header className="header">
-      <h1 className="header__title">CosmicLog</h1>
-      <Navigation />
+      {/* ... tu contenido de logo y nav ... */}
+      <button className="header__login-button" onClick={onLoginClick}>
+        Inicia sesión
+      </button>
     </header>
   );
 }
-
-export default Header;
