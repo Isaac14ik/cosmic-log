@@ -1,14 +1,15 @@
-.saved-cards {
-  padding: 40px 20px;
-  text-align: center;
+.saved-cards-page {
   min-height: calc(100vh - 160px);
 }
 
-.saved-cards__title {
-  font-size: 28px;
-  margin-bottom: 10px;
+.saved-cards-page__section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px 60px;
 }
 
-.saved-cards__subtitle {
-  color: #aaaaaa;
+.saved-cards-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
 }

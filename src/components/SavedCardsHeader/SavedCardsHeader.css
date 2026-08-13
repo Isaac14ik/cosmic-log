@@ -1,0 +1,50 @@
+.saved-header {
+  padding: 40px 20px 30px;
+  background-color: #0b0d17;
+}
+
+.saved-header__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.saved-header__subtitle {
+  font-size: 14px;
+  color: #8899a6;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.saved-header__title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 24px;
+  max-width: 530px;
+}
+
+.saved-header__keywords {
+  font-size: 18px;
+  color: #b6c2d0;
+}
+
+.saved-header__keywords-bold {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+@media screen and (max-width: 768px) {
+  .saved-header {
+    padding: 24px 16px;
+  }
+
+  .saved-header__title {
+    font-size: 24px;
+  }
+
+  .saved-header__keywords {
+    font-size: 15px;
+  }
+}
