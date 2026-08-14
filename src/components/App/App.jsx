@@ -28,13 +28,17 @@ function App() {
   // Tarjetas guardadas en la bitácora
   const [savedArticles, setSavedArticles] = useState([]);
 
-  // Cargar estado inicial desde localStorage
+  // Cargar estado inicial desde localStorage al montar App
   useEffect(() => {
     // Restaurar sesión guardada
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
+      try {
+        setCurrentUser(JSON.parse(storedUser));
+        setIsLoggedIn(true);
+      } catch (e) {
+        console.error('Error al leer currentUser de localStorage:', e);
+      }
     }
 
     // Restaurar búsquedas previas
@@ -53,7 +57,7 @@ function App() {
 
     if (storedKeyword) setSearchKeyword(storedKeyword);
 
-    // Restaurar tarjetas guardadas en bitácora
+    // Restaurar tarjetas guardadas en la bitácora
     const storedSaved = localStorage.getItem('savedArticles');
     if (storedSaved) {
       try {
@@ -64,7 +68,7 @@ function App() {
     }
   }, []);
 
-  // Búsqueda en la API
+  // Manejo de Búsqueda en la API
   const handleSearchSubmit = (keyword) => {
     if (!keyword.trim()) return;
 
@@ -111,7 +115,7 @@ function App() {
     setVisibleCount((prev) => prev + 3);
   };
 
-  // Modales
+  // Control de Modales
   const closeAllPopups = () => {
     setIsLoginOpen(false);
     setIsRegisterOpen(false);
@@ -127,12 +131,17 @@ function App() {
     setIsRegisterOpen(true);
   };
 
-  // Simulación de Login
+  // Simulación de Login (se extrae el nombre correctamente del correo)
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const email = formData.get('email');
-    const username = email.split('@')[0] || 'Explorador';
+    const email = formData.get('email') || '';
+
+    // Extraer nombre del correo; si no hay arroba o son solo números, asignar 'Explorador'
+    let username = email.includes('@') ? email.split('@')[0] : 'Explorador';
+    if (!username || /^\d+$/.test(username)) {
+      username = 'Explorador';
+    }
 
     const user = { name: username, email: email };
     setCurrentUser(user);
@@ -146,7 +155,7 @@ function App() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const username = formData.get('username') || 'Explorador';
-    const email = formData.get('email');
+    const email = formData.get('email') || '';
 
     const user = { name: username, email: email };
     setCurrentUser(user);
@@ -179,7 +188,7 @@ function App() {
     localStorage.setItem('savedArticles', JSON.stringify(updatedSaved));
   };
 
-  // Eliminar específicamente desde la ruta /saved-cards
+  // Eliminar tarjeta directamente desde la página /saved-cards
   const handleDeleteSavedCard = (cardId) => {
     const updated = savedArticles.filter((item) => item.id !== cardId);
     setSavedArticles(updated);
