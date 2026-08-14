@@ -1,24 +1,24 @@
 import React from 'react';
 import './SavedCardsHeader.css';
 
-function SavedCardsHeader({ savedCount = 3, keywords = ['Marte', 'Andrómeda', 'Nebulosa'] }) {
-  // Formatear las palabras clave
-  const formattedKeywords = keywords.length > 2
-    ? `${keywords.slice(0, 2).join(', ')} y ${keywords.length - 2} más`
-    : keywords.join(', ');
+function SavedCardsHeader({ username, count, keywords = [] }) {
+  const renderKeywordsText = () => {
+    if (keywords.length === 0) return 'Ninguna';
+    if (keywords.length === 1) return keywords[0];
+    if (keywords.length === 2) return `${keywords[0]} y ${keywords[1]}`;
+    return `${keywords[0]}, ${keywords[1]} y ${keywords.length - 2} más`;
+  };
 
   return (
-    <section className="saved-header">
-      <div className="saved-header__container">
-        <p className="saved-header__subtitle">Artículos guardados</p>
-        <h1 className="saved-header__title">
-          Explorador, tienes {savedCount} artículos guardados
-        </h1>
-        <p className="saved-header__keywords">
-          Por palabras clave: <span className="saved-header__keywords-bold">{formattedKeywords}</span>
-        </p>
-      </div>
-    </section>
+    <header className="saved-cards-header">
+      <p className="saved-cards-header__subtitle">Artículos guardados</p>
+      <h1 className="saved-cards-header__title">
+        {username}, tienes {count} artículo{count === 1 ? '' : 's'} guardado{count === 1 ? '' : 's'}
+      </h1>
+      <p className="saved-cards-header__keywords">
+        Por palabras clave: <span>{renderKeywordsText()}</span>
+      </p>
+    </header>
   );
 }
 

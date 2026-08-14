@@ -9,11 +9,15 @@ import thirdPartyApi from '../../utils/ThirdPartyApi';
 import './App.css';
 
 function App() {
-  // Estados para modales
+  // Modales
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
-  // Estados para la API y búsquedas
+  // Autenticación simulada
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState({ name: '' });
+
+  // API y búsqueda
   const [articles, setArticles] = useState([]);
   const [visibleCount, setVisibleCount] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,29 +25,46 @@ function App() {
   const [hasError, setHasError] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
 
-  // Cargar datos de localStorage al montar el componente App
-  useEffect(() => {
-    const savedArticles = localStorage.getItem('searchedArticles');
-    const savedKeyword = localStorage.getItem('searchKeyword');
+  // Tarjetas guardadas en la bitácora
+  const [savedArticles, setSavedArticles] = useState([]);
 
-    if (savedArticles) {
+  // Cargar estado inicial desde localStorage
+  useEffect(() => {
+    // Restaurar sesión guardada
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
+      setIsLoggedIn(true);
+    }
+
+    // Restaurar búsquedas previas
+    const storedArticles = localStorage.getItem('searchedArticles');
+    const storedKeyword = localStorage.getItem('searchKeyword');
+
+    if (storedArticles) {
       try {
-        const parsedArticles = JSON.parse(savedArticles);
-        setArticles(parsedArticles);
-        if (parsedArticles.length === 0) {
-          setIsNotFound(true);
-        }
+        const parsed = JSON.parse(storedArticles);
+        setArticles(parsed);
+        if (parsed.length === 0) setIsNotFound(true);
       } catch (e) {
-        console.error('Error al leer de localStorage:', e);
+        console.error('Error al leer searchedArticles:', e);
       }
     }
 
-    if (savedKeyword) {
-      setSearchKeyword(savedKeyword);
+    if (storedKeyword) setSearchKeyword(storedKeyword);
+
+    // Restaurar tarjetas guardadas en bitácora
+    const storedSaved = localStorage.getItem('savedArticles');
+    if (storedSaved) {
+      try {
+        setSavedArticles(JSON.parse(storedSaved));
+      } catch (e) {
+        console.error('Error al leer savedArticles:', e);
+      }
     }
   }, []);
 
-  // Función para manejar la búsqueda mediante la API de terceros
+  // Búsqueda en la API
   const handleSearchSubmit = (keyword) => {
     if (!keyword.trim()) return;
 
@@ -57,12 +78,9 @@ function App() {
     thirdPartyApi
       .searchArticles(keyword)
       .then((data) => {
-        // La API devuelve un objeto con la propiedad 'results'
         const results = data.results || [];
-        
-        // Mapeamos los datos al formato que esperan nuestros componentes Card
-        const formattedArticles = results.map((item) => ({
-          id: item.id,
+        const formatted = results.map((item) => ({
+          id: String(item.id),
           title: item.title,
           date: new Date(item.published_at).toLocaleDateString('es-ES', {
             year: 'numeric',
@@ -73,33 +91,27 @@ function App() {
           url: item.image_url || 'https://via.placeholder.com/400x200?text=No+Image',
           link: item.url,
           keyword: keyword,
+          source: item.news_site || 'CosmicNews',
         }));
 
-        setArticles(formattedArticles);
-
-        // Guardar resultados y palabra clave en localStorage
-        localStorage.setItem('searchedArticles', JSON.stringify(formattedArticles));
+        setArticles(formatted);
+        localStorage.setItem('searchedArticles', JSON.stringify(formatted));
         localStorage.setItem('searchKeyword', keyword);
 
-        if (formattedArticles.length === 0) {
-          setIsNotFound(true);
-        }
+        if (formatted.length === 0) setIsNotFound(true);
       })
       .catch((err) => {
-        console.error('Error al realizar la búsqueda:', err);
+        console.error('Error en búsqueda:', err);
         setHasError(true);
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .finally(() => setIsLoading(false));
   };
 
-  // Función para cargar 3 tarjetas más
   const handleShowMore = () => {
-    setVisibleCount((prevCount) => prevCount + 3);
+    setVisibleCount((prev) => prev + 3);
   };
 
-  // Control de modales
+  // Modales
   const closeAllPopups = () => {
     setIsLoginOpen(false);
     setIsRegisterOpen(false);
@@ -115,9 +127,73 @@ function App() {
     setIsRegisterOpen(true);
   };
 
+  // Simulación de Login
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+    const username = email.split('@')[0] || 'Explorador';
+
+    const user = { name: username, email: email };
+    setCurrentUser(user);
+    setIsLoggedIn(true);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    closeAllPopups();
+  };
+
+  // Simulación de Registro
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const username = formData.get('username') || 'Explorador';
+    const email = formData.get('email');
+
+    const user = { name: username, email: email };
+    setCurrentUser(user);
+    setIsLoggedIn(true);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    closeAllPopups();
+  };
+
+  // Simulación de Logout
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setCurrentUser({ name: '' });
+    localStorage.removeItem('currentUser');
+  };
+
+  // Guardar o eliminar tarjeta de la bitácora
+  const handleBookmarkToggle = (card) => {
+    if (!isLoggedIn) return;
+
+    const isAlreadySaved = savedArticles.some((item) => item.id === card.id);
+    let updatedSaved;
+
+    if (isAlreadySaved) {
+      updatedSaved = savedArticles.filter((item) => item.id !== card.id);
+    } else {
+      updatedSaved = [card, ...savedArticles];
+    }
+
+    setSavedArticles(updatedSaved);
+    localStorage.setItem('savedArticles', JSON.stringify(updatedSaved));
+  };
+
+  // Eliminar específicamente desde la ruta /saved-cards
+  const handleDeleteSavedCard = (cardId) => {
+    const updated = savedArticles.filter((item) => item.id !== cardId);
+    setSavedArticles(updated);
+    localStorage.setItem('savedArticles', JSON.stringify(updated));
+  };
+
   return (
     <div className="page">
-      <Header onLoginClick={handleOpenLogin} />
+      <Header
+        isLoggedIn={isLoggedIn}
+        currentUser={currentUser}
+        onLoginClick={handleOpenLogin}
+        onLogoutClick={handleLogout}
+      />
 
       <Routes>
         <Route
@@ -132,10 +208,22 @@ function App() {
               isLoading={isLoading}
               isNotFound={isNotFound}
               hasError={hasError}
+              isLoggedIn={isLoggedIn}
+              savedArticles={savedArticles}
+              onBookmarkToggle={handleBookmarkToggle}
             />
           }
         />
-        <Route path="/saved-cards" element={<SavedCards />} />
+        <Route
+          path="/saved-cards"
+          element={
+            <SavedCards
+              currentUser={currentUser}
+              savedArticles={savedArticles}
+              onDeleteCard={handleDeleteSavedCard}
+            />
+          }
+        />
       </Routes>
 
       <Footer />
@@ -149,15 +237,13 @@ function App() {
         buttonText="Inicia sesión"
         redirectText="Regístrate"
         onRedirectClick={handleOpenRegister}
-        onSubmit={(e) => {
-          e.preventDefault();
-          closeAllPopups();
-        }}
+        onSubmit={handleLoginSubmit}
       >
         <div className="popup__input-group">
           <label className="popup__label">Correo electrónico</label>
           <input
             type="email"
+            name="email"
             className="popup__input"
             placeholder="Introduce tu correo electrónico"
             required
@@ -167,6 +253,7 @@ function App() {
           <label className="popup__label">Contraseña</label>
           <input
             type="password"
+            name="password"
             className="popup__input"
             placeholder="Introduce tu contraseña"
             required
@@ -183,15 +270,13 @@ function App() {
         buttonText="Inscribirse"
         redirectText="Iniciar sesión"
         onRedirectClick={handleOpenLogin}
-        onSubmit={(e) => {
-          e.preventDefault();
-          closeAllPopups();
-        }}
+        onSubmit={handleRegisterSubmit}
       >
         <div className="popup__input-group">
           <label className="popup__label">Correo electrónico</label>
           <input
             type="email"
+            name="email"
             className="popup__input"
             placeholder="Introduce tu correo electrónico"
             required
@@ -201,6 +286,7 @@ function App() {
           <label className="popup__label">Contraseña</label>
           <input
             type="password"
+            name="password"
             className="popup__input"
             placeholder="Introduce tu contraseña"
             required
@@ -210,6 +296,7 @@ function App() {
           <label className="popup__label">Nombre de usuario</label>
           <input
             type="text"
+            name="username"
             className="popup__input"
             placeholder="Introduce tu nombre de usuario"
             required

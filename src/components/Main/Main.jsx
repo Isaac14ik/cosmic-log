@@ -15,10 +15,12 @@ function Main({
   isLoading,
   isNotFound,
   hasError,
+  isLoggedIn,
+  savedArticles,
+  onBookmarkToggle,
 }) {
   return (
     <main className="main">
-      {/* Sección Hero con buscador */}
       <section className="hero">
         <div className="hero__content">
           <h1 className="hero__title">¿Qué quieres explorar hoy?</h1>
@@ -29,13 +31,8 @@ function Main({
         </div>
       </section>
 
-      {/* Estado de Carga */}
       {isLoading && <Preloader />}
-
-      {/* Estado Sin Resultados */}
       {isNotFound && !isLoading && <NotFound />}
-
-      {/* Estado de Error de Servidor */}
       {hasError && !isLoading && (
         <div className="main__error-message">
           <p>
@@ -45,17 +42,18 @@ function Main({
         </div>
       )}
 
-      {/* Lista de Resultados */}
       {!isLoading && !isNotFound && !hasError && articles.length > 0 && (
         <CardsSection
           articles={articles}
           totalArticlesCount={totalArticlesCount}
           visibleCount={visibleCount}
           onShowMore={onShowMore}
+          isLoggedIn={isLoggedIn}
+          savedArticles={savedArticles}
+          onBookmarkToggle={onBookmarkToggle}
         />
       )}
 
-      {/* Sección Acerca del Autor */}
       <About />
     </main>
   );
