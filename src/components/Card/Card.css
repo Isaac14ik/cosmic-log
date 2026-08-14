@@ -111,3 +111,33 @@
   border-color: rgba(47, 113, 229, 0.6);
   box-shadow: 0 12px 30px rgba(47, 113, 229, 0.3);
 }
+
+.card__tooltip {
+  position: absolute;
+  top: 12px;
+  right: 52px;
+  background-color: #ffffff;
+  color: #1a1d2d;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  z-index: 10;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.card__source {
+  font-size: 11px;
+  color: #8899a6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -64,3 +64,8 @@
     width: 100%;
   }
 }
+
+.search-form__input_error::placeholder {
+  color: #ff4d4d;
+  font-weight: 500;
+}
