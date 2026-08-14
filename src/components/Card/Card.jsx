@@ -12,23 +12,29 @@ function Card({ card }) {
     <article className="card">
       <div className="card__image-container">
         <img src={card.url} alt={card.title} className="card__image" />
-        
-        {/* Botón interactivo para guardar */}
         <button
           type="button"
-          className={`card__save-button ${isSaved ? 'card__save-button_active' : ''}`}
+          className={`card__tag ${isSaved ? 'card__tag_active' : ''}`}
           onClick={handleSaveClick}
-          aria-label="Guardar tarjeta"
+          aria-label="Guardar artículo"
         >
-          {isSaved ? '🔖' : '🏷️'}
+          🔖
         </button>
       </div>
-
       <div className="card__content">
         <p className="card__date">{card.date}</p>
         <h3 className="card__title">{card.title}</h3>
-        <p className="card__description">{card.explanation}</p>
-        <span className="card__source">{card.copyright || 'NASA APOD'}</span>
+        <p className="card__text">{card.explanation}</p>
+        {card.link && (
+          <a
+            href={card.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card__link"
+          >
+            Leer artículo completo →
+          </a>
+        )}
       </div>
     </article>
   );
