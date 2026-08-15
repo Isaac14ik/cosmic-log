@@ -1,25 +1,21 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import './PopupWithForm.css';
 
-function PopupWithForm({
+export default function PopupWithForm({
   isOpen,
   onClose,
   title,
-  name,
-  buttonText,
   children,
+  buttonText,
   onSubmit,
   redirectText,
-  onRedirectClick
+  onRedirect
 }) {
-  // Manejo de la tecla Escape para cerrar el popup
   useEffect(() => {
     if (!isOpen) return;
 
     const handleEsc = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     };
 
     window.addEventListener('keydown', handleEsc);
@@ -28,42 +24,37 @@ function PopupWithForm({
 
   if (!isOpen) return null;
 
-  // Cierre al hacer clic en el overlay oscuro (fuera del modal)
-  const handleOverlayClick = (e) => {
-    if (e.target.classList.contains('popup_opened')) {
-      onClose();
-    }
-  };
-
   return (
-    <div className={`popup popup_type_${name} popup_opened`} onClick={handleOverlayClick}>
-      <div className="popup__container">
+    <div className="popup" onClick={onClose}>
+      <div className="popup__container" onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
-          className="popup__close-button"
+          className="popup__close"
           onClick={onClose}
           aria-label="Cerrar modal"
         >
           &times;
         </button>
-        <h3 className="popup__title">{title}</h3>
-        <form className="popup__form" name={name} onSubmit={onSubmit}>
+        <h2 className="popup__title">{title}</h2>
+        <form className="popup__form" onSubmit={onSubmit}>
           {children}
-          <button type="submit" className="popup__submit-button">
+          <button type="submit" className="popup__submit">
             {buttonText}
           </button>
         </form>
         {redirectText && (
           <p className="popup__redirect">
             o{' '}
-            <span className="popup__redirect-link" onClick={onRedirectClick}>
+            <button
+              type="button"
+              className="popup__redirect-button"
+              onClick={onRedirect}
+            >
               {redirectText}
-            </span>
+            </button>
           </p>
         )}
       </div>
     </div>
   );
 }
-
-export default PopupWithForm;

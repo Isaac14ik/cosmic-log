@@ -1,15 +1,35 @@
-.saved-cards-page {
-  min-height: calc(100vh - 160px);
+.saved-cards {
+  width: 100%;
+  flex: 1;
 }
 
-.saved-cards-page__section {
-  max-width: 1200px;
+.saved-cards__content {
+  width: 100%;
+  padding: 60px 0;
+  background-color: #f5f6f7;
+}
+
+.saved-cards__container {
+  max-width: 1240px;
+  width: 100%;
   margin: 0 auto;
-  padding: 30px 20px 60px;
+  padding: 0 16px;
 }
 
-.saved-cards-page__grid {
+.saved-cards__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media screen and (max-width: 1024px) {
+  .saved-cards__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .saved-cards__grid {
+    grid-template-columns: 1fr;
+  }
 }
