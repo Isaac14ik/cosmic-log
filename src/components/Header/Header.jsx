@@ -1,4 +1,4 @@
-import { NavLink, Link } from 'react_router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import './Header.css';
 
 export default function Header({ isLoggedIn, onLoginClick, onLogout, currentUser }) {

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import SearchForm from '../SearchForm/SearchForm';
 import CardsSection from '../CardsSection/CardsSection';
 import Preloader from '../Preloader/Preloader';

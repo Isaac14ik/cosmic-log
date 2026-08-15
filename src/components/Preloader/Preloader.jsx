@@ -1,7 +1,6 @@
-import React from 'react';
 import './Preloader.css';
 
-function Preloader() {
+export default function Preloader() {
   return (
     <div className="preloader">
       <div className="preloader__circle"></div>
@@ -9,5 +8,3 @@ function Preloader() {
     </div>
   );
 }
-
-export default Preloader;

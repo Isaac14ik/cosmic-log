@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Header from './components/Header/Header';
-import SearchForm from './components/SearchForm/SearchForm';
-import CardsSection from './components/CardsSection/CardsSection';
-import SavedCards from './components/SavedCards/SavedCards';
-import About from './components/About/About';
-import Footer from './components/Footer/Footer';
-import Preloader from './components/Preloader/Preloader';
-import NotFound from './components/NotFound/NotFound';
-import PopupWithForm from './components/PopupWithForm/PopupWithForm';
-import { thirdPartyApi } from './utils/ThirdPartyApi';
-import { CARDS_PER_PAGE, SEARCH_KEYWORD_STORAGE_KEY } from './utils/constants';
+import Header from '../Header/Header';
+import SearchForm from '../SearchForm/SearchForm';
+import CardsSection from '../CardsSection/CardsSection';
+import SavedCards from '../SavedCards/SavedCards';
+import About from '../About/About';
+import Footer from '../Footer/Footer';
+import Preloader from '../Preloader/Preloader';
+import NotFound from '../NotFound/NotFound';
+import PopupWithForm from '../PopupWithForm/PopupWithForm';
+import thirdPartyApi from '../../utils/ThirdPartyApi';
+import { CARDS_PER_PAGE, SEARCH_KEYWORD_STORAGE_KEY } from '../../utils/constants';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,13 +20,21 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [visibleCount, setVisibleCount] = useState(CARDS_PER_PAGE);
+
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
+
   const [regEmail, setRegEmail] = useState('');
   const [regPass, setRegPass] = useState('');
   const [regName, setRegName] = useState('');
+
+  const [registeredUsers, setRegisteredUsers] = useState([]);
+
+  const [loginError, setLoginError] = useState('');
+  const [registerError, setRegisterError] = useState('');
 
   const handleSearch = (query) => {
     setIsLoading(true);
@@ -74,16 +82,50 @@ export default function App() {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
+    setLoginError('');
+
+    if (!loginEmail.trim() || !loginPass.trim()) {
+      setLoginError('Por favor completa la información de manera apropiada.');
+      return;
+    }
+
+    const foundUser = registeredUsers.find(
+      (u) => u.email === loginEmail && u.password === loginPass
+    );
+
+    if (!foundUser && registeredUsers.length > 0) {
+      setLoginError('El usuario no existe o la contraseña es incorrecta. ¡Regístrate primero!');
+      return;
+    }
+
+    const username = foundUser ? foundUser.name : loginEmail.split('@')[0] || 'Usuario';
     setIsLoggedIn(true);
-    setCurrentUser({ name: loginEmail.split('@')[0] || 'Usuario' });
+    setCurrentUser({ name: username });
     setIsLoginOpen(false);
+    setLoginEmail('');
+    setLoginPass('');
+    setLoginError('');
   };
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
+    setRegisterError('');
+
+    if (!regEmail.trim() || !regPass.trim() || !regName.trim()) {
+      setRegisterError('Por favor completa la información de manera apropiada.');
+      return;
+    }
+
+    const newUser = { email: regEmail, password: regPass, name: regName };
+    setRegisteredUsers([...registeredUsers, newUser]);
+
     setIsLoggedIn(true);
-    setCurrentUser({ name: regName || 'Usuario' });
+    setCurrentUser({ name: regName });
     setIsRegisterOpen(false);
+    setRegEmail('');
+    setRegPass('');
+    setRegName('');
+    setRegisterError('');
   };
 
   const handleLogout = () => {
@@ -91,11 +133,21 @@ export default function App() {
     setCurrentUser({ name: '' });
   };
 
+  const closeAllPopups = () => {
+    setIsLoginOpen(false);
+    setIsRegisterOpen(false);
+    setLoginError('');
+    setRegisterError('');
+  };
+
   return (
     <div className="page">
       <Header
         isLoggedIn={isLoggedIn}
-        onLoginClick={() => setIsLoginOpen(true)}
+        onLoginClick={() => {
+          setLoginError('');
+          setIsLoginOpen(true);
+        }}
         onLogout={handleLogout}
         currentUser={currentUser}
       />
@@ -137,13 +189,14 @@ export default function App() {
 
       <PopupWithForm
         isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
+        onClose={closeAllPopups}
         title="Iniciar sesión"
         buttonText="Iniciar sesión"
         onSubmit={handleLoginSubmit}
+        errorMessage={loginError}
         redirectText="Regístrate"
         onRedirect={() => {
-          setIsLoginOpen(false);
+          closeAllPopups();
           setIsRegisterOpen(true);
         }}
       >
@@ -151,7 +204,6 @@ export default function App() {
         <input
           id="login-email"
           type="email"
-          required
           value={loginEmail}
           onChange={(e) => setLoginEmail(e.target.value)}
         />
@@ -159,7 +211,6 @@ export default function App() {
         <input
           id="login-password"
           type="password"
-          required
           value={loginPass}
           onChange={(e) => setLoginPass(e.target.value)}
         />
@@ -167,13 +218,14 @@ export default function App() {
 
       <PopupWithForm
         isOpen={isRegisterOpen}
-        onClose={() => setIsRegisterOpen(false)}
+        onClose={closeAllPopups}
         title="Inscribirse"
         buttonText="Inscribirse"
         onSubmit={handleRegisterSubmit}
+        errorMessage={registerError}
         redirectText="Iniciar sesión"
         onRedirect={() => {
-          setIsRegisterOpen(false);
+          closeAllPopups();
           setIsLoginOpen(true);
         }}
       >
@@ -181,7 +233,6 @@ export default function App() {
         <input
           id="reg-email"
           type="email"
-          required
           value={regEmail}
           onChange={(e) => setRegEmail(e.target.value)}
         />
@@ -189,7 +240,6 @@ export default function App() {
         <input
           id="reg-password"
           type="password"
-          required
           value={regPass}
           onChange={(e) => setRegPass(e.target.value)}
         />
@@ -197,7 +247,6 @@ export default function App() {
         <input
           id="reg-name"
           type="text"
-          required
           value={regName}
           onChange={(e) => setRegName(e.target.value)}
         />

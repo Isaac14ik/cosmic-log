@@ -9,7 +9,8 @@ export default function PopupWithForm({
   buttonText,
   onSubmit,
   redirectText,
-  onRedirect
+  onRedirect,
+  errorMessage,
 }) {
   useEffect(() => {
     if (!isOpen) return;
@@ -36,8 +37,11 @@ export default function PopupWithForm({
           &times;
         </button>
         <h2 className="popup__title">{title}</h2>
-        <form className="popup__form" onSubmit={onSubmit}>
+        <form className="popup__form" onSubmit={onSubmit} noValidate>
           {children}
+          {errorMessage && (
+            <span className="popup__error-message">{errorMessage}</span>
+          )}
           <button type="submit" className="popup__submit">
             {buttonText}
           </button>
