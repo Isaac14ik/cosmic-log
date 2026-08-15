@@ -1,83 +1,49 @@
-import React, { useState } from 'react';
 import './Card.css';
 
-function Card({
-  card,
-  isLoggedIn = false,
-  isSaved = false,
-  onBookmarkToggle,
-  isSavedCardsRoute = false,
-  onDeleteCard,
-}) {
-  const [showTooltip, setShowTooltip] = useState(false);
-
-  const handleBookmarkClick = () => {
-    if (!isLoggedIn) return;
-    if (onBookmarkToggle) onBookmarkToggle(card);
-  };
-
-  const handleDeleteClick = () => {
-    if (onDeleteCard) onDeleteCard(card.id);
+export default function Card({ card, onBookmarkClick, isLoggedIn, isSavedPage }) {
+  const handleBookmark = () => {
+    if (onBookmarkClick) {
+      onBookmarkClick(card);
+    }
   };
 
   return (
     <article className="card">
       <div className="card__image-container">
-        <img src={card.url} alt={card.title} className="card__image" />
-
-        {/* Etiqueta del tema (keyword) en la Bitácora */}
-        {isSavedCardsRoute && card.keyword && (
-          <span className="card__keyword-tag">{card.keyword}</span>
-        )}
-
-        {/* Tooltip si no ha iniciado sesión */}
-        {!isLoggedIn && !isSavedCardsRoute && showTooltip && (
+        <img src={card.image_url} alt={card.title} className="card__image" />
+        <button
+          type="button"
+          className={`card__bookmark ${card.isSaved ? 'card__bookmark_active' : ''}`}
+          onClick={handleBookmark}
+          aria-label="Guardar artículo"
+        >
+          <svg className="card__bookmark-icon" viewBox="0 0 24 24" width="24" height="24">
+            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+          </svg>
+        </button>
+        {!isLoggedIn && !isSavedPage && (
           <div className="card__tooltip">Inicia sesión para guardar artículos</div>
         )}
-
-        {/* Botón de Guardar en Inicio / Eliminar en Bitácora */}
-        {isSavedCardsRoute ? (
-          <button
-            type="button"
-            className="card__tag card__tag_delete"
-            onClick={handleDeleteClick}
-            aria-label="Eliminar artículo"
-            title="Eliminar de la bitácora"
-          >
-            🗑️
-          </button>
-        ) : (
-          <button
-            type="button"
-            className={`card__tag ${isSaved ? 'card__tag_active' : ''}`}
-            onClick={handleBookmarkClick}
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
-            aria-label="Guardar artículo"
-          >
-            🔖
-          </button>
-        )}
       </div>
-
       <div className="card__content">
-        <p className="card__date">{card.date}</p>
+        <p className="card__date">
+          {new Date(card.published_at).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </p>
         <h3 className="card__title">{card.title}</h3>
-        <p className="card__text">{card.explanation}</p>
-        {card.source && <span className="card__source">{card.source}</span>}
-        {card.link && (
-          <a
-            href={card.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="card__link"
-          >
-            Leer artículo completo →
-          </a>
-        )}
+        <p className="card__text">{card.summary}</p>
+        <a
+          href={card.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="card__source"
+        >
+          {card.news_site}
+        </a>
       </div>
     </article>
   );
 }
-
-export default Card;

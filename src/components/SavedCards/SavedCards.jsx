@@ -1,41 +1,32 @@
-import React from 'react';
 import SavedCardsHeader from '../SavedCardsHeader/SavedCardsHeader';
 import Card from '../Card/Card';
 import './SavedCards.css';
 
-function SavedCards({ currentUser, savedArticles = [], onDeleteCard }) {
-  // Extraer las palabras clave únicas de los artículos guardados
-  const keywords = [...new Set(savedArticles.map((art) => art.keyword))].filter(Boolean);
+export default function SavedCards({ savedCards, currentUser, onBookmarkClick }) {
+  const keywords = [...new Set(savedCards.map((c) => c.keyword || 'Espacio'))];
 
   return (
-    <div className="saved-cards-page">
+    <main className="saved-cards">
       <SavedCardsHeader
-        username={currentUser.name}
-        count={savedArticles.length}
+        currentUser={currentUser}
+        savedCount={savedCards.length}
         keywords={keywords}
       />
-
       <section className="saved-cards__content">
-        {savedArticles.length === 0 ? (
-          <div className="saved-cards__empty">
-            <p>Aún no has guardado ningún artículo en tu bitácora cósmica.</p>
-          </div>
-        ) : (
-          <div className="cards-section__grid">
-            {savedArticles.map((card) => (
+        <div className="saved-cards__container">
+          <div className="saved-cards__grid">
+            {savedCards.map((card) => (
               <Card
                 key={card.id}
                 card={card}
+                onBookmarkClick={onBookmarkClick}
                 isLoggedIn={true}
-                isSavedCardsRoute={true}
-                onDeleteCard={onDeleteCard}
+                isSavedPage={true}
               />
             ))}
           </div>
-        )}
+        </div>
       </section>
-    </div>
+    </main>
   );
 }
-
-export default SavedCards;

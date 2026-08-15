@@ -1,38 +1,46 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './SearchForm.css';
 
-function SearchForm({ onSearchSubmit }) {
+export default function SearchForm({ onSearch, isLoading }) {
   const [keyword, setKeyword] = useState('');
-  const [placeholder, setPlaceholder] = useState('Introduce un tema (ej. Marte, NASA)');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!keyword.trim()) {
-      setPlaceholder('Por favor, introduzca una palabra clave');
-      return;
-    }
-    onSearchSubmit(keyword);
+    if (!keyword.trim()) return;
+    onSearch(keyword);
   };
 
   return (
-    <form className="search-form" onSubmit={handleSubmit} noValidate>
-      <input
-        type="text"
-        className={`search-form__input ${placeholder.includes('Por favor') ? 'search-form__input_error' : ''}`}
-        placeholder={placeholder}
-        value={keyword}
-        onChange={(e) => {
-          setKeyword(e.target.value);
-          if (placeholder.includes('Por favor')) {
-            setPlaceholder('Introduce un tema (ej. Marte, NASA)');
-          }
-        }}
-      />
-      <button type="submit" className="search-form__button">
-        Buscar
-      </button>
-    </form>
+    <section className="hero">
+      <div className="hero__container">
+        <h1 className="hero__title">¿Qué está pasando en el cosmos?</h1>
+        <p className="hero__subtitle">
+          Encuentra las últimas noticias sobre la exploración espacial y guarda tus artículos favoritos.
+        </p>
+        <form className="search-form" onSubmit={handleSubmit}>
+          <label htmlFor="search-input" className="search-form__label">
+            Buscar noticias espaciales
+          </label>
+          <div className="search-form__wrapper">
+            <input
+              id="search-input"
+              className="search-form__input"
+              type="text"
+              placeholder="Introduce un tema (ej. mars, moon, nasa)"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              required
+            />
+            <button
+              className="search-form__button"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Buscando...' : 'Buscar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
   );
 }
-
-export default SearchForm;

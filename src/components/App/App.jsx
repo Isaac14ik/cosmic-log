@@ -1,235 +1,133 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Header from '../Header/Header';
-import Main from '../Main/Main';
-import SavedCards from '../SavedCards/SavedCards';
-import Footer from '../Footer/Footer';
-import PopupWithForm from '../PopupWithForm/PopupWithForm';
-import thirdPartyApi from '../../utils/ThirdPartyApi';
-import './App.css';
+import Header from './components/Header/Header';
+import SearchForm from './components/SearchForm/SearchForm';
+import CardsSection from './components/CardsSection/CardsSection';
+import SavedCards from './components/SavedCards/SavedCards';
+import About from './components/About/About';
+import Footer from './components/Footer/Footer';
+import Preloader from './components/Preloader/Preloader';
+import NotFound from './components/NotFound/NotFound';
+import PopupWithForm from './components/PopupWithForm/PopupWithForm';
+import { thirdPartyApi } from './utils/ThirdPartyApi';
+import { CARDS_PER_PAGE, SEARCH_KEYWORD_STORAGE_KEY } from './utils/constants';
 
-function App() {
-  // Modales
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-
-  // Autenticación simulada
+export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({ name: '' });
-
-  // API y búsqueda
-  const [articles, setArticles] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(3);
+  const [cards, setCards] = useState([]);
+  const [savedCards, setSavedCards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isNotFound, setIsNotFound] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(CARDS_PER_PAGE);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPass, setLoginPass] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPass, setRegPass] = useState('');
+  const [regName, setRegName] = useState('');
 
-  // Tarjetas guardadas en la bitácora
-  const [savedArticles, setSavedArticles] = useState([]);
-
-  // Cargar estado inicial desde localStorage al montar App
-  useEffect(() => {
-    // Restaurar sesión guardada
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      try {
-        setCurrentUser(JSON.parse(storedUser));
-        setIsLoggedIn(true);
-      } catch (e) {
-        console.error('Error al leer currentUser de localStorage:', e);
-      }
-    }
-
-    // Restaurar búsquedas previas
-    const storedArticles = localStorage.getItem('searchedArticles');
-    const storedKeyword = localStorage.getItem('searchKeyword');
-
-    if (storedArticles) {
-      try {
-        const parsed = JSON.parse(storedArticles);
-        setArticles(parsed);
-        if (parsed.length === 0) setIsNotFound(true);
-      } catch (e) {
-        console.error('Error al leer searchedArticles:', e);
-      }
-    }
-
-    if (storedKeyword) setSearchKeyword(storedKeyword);
-
-    // Restaurar tarjetas guardadas en la bitácora
-    const storedSaved = localStorage.getItem('savedArticles');
-    if (storedSaved) {
-      try {
-        setSavedArticles(JSON.parse(storedSaved));
-      } catch (e) {
-        console.error('Error al leer savedArticles:', e);
-      }
-    }
-  }, []);
-
-  // Manejo de Búsqueda en la API
-  const handleSearchSubmit = (keyword) => {
-    if (!keyword.trim()) return;
-
+  const handleSearch = (query) => {
     setIsLoading(true);
-    setIsNotFound(false);
-    setHasError(false);
-    setArticles([]);
-    setVisibleCount(3);
-    setSearchKeyword(keyword);
+    setHasSearched(true);
+    setVisibleCount(CARDS_PER_PAGE);
+    localStorage.setItem(SEARCH_KEYWORD_STORAGE_KEY, query);
 
     thirdPartyApi
-      .searchArticles(keyword)
+      .getArticles(query)
       .then((data) => {
-        const results = data.results || [];
-        const formatted = results.map((item) => ({
-          id: String(item.id),
+        const formatted = data.results.map((item) => ({
+          id: item.id,
           title: item.title,
-          date: new Date(item.published_at).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          }),
-          explanation: item.summary || 'Sin descripción disponible.',
-          url: item.image_url || 'https://via.placeholder.com/400x200?text=No+Image',
-          link: item.url,
-          keyword: keyword,
-          source: item.news_site || 'CosmicNews',
+          summary: item.summary,
+          published_at: item.published_at,
+          image_url: item.image_url,
+          url: item.url,
+          news_site: item.news_site,
+          keyword: query,
+          isSaved: false,
         }));
-
-        setArticles(formatted);
-        localStorage.setItem('searchedArticles', JSON.stringify(formatted));
-        localStorage.setItem('searchKeyword', keyword);
-
-        if (formatted.length === 0) setIsNotFound(true);
+        setCards(formatted);
       })
-      .catch((err) => {
-        console.error('Error en búsqueda:', err);
-        setHasError(true);
-      })
+      .catch((err) => console.error(err))
       .finally(() => setIsLoading(false));
   };
 
-  const handleShowMore = () => {
-    setVisibleCount((prev) => prev + 3);
+  const handleBookmarkClick = (card) => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+      return;
+    }
+
+    const isAlreadySaved = savedCards.some((item) => item.id === card.id);
+
+    if (isAlreadySaved) {
+      setSavedCards(savedCards.filter((item) => item.id !== card.id));
+      setCards(cards.map((c) => (c.id === card.id ? { ...c, isSaved: false } : c)));
+    } else {
+      const newCard = { ...card, isSaved: true };
+      setSavedCards([...savedCards, newCard]);
+      setCards(cards.map((c) => (c.id === card.id ? { ...c, isSaved: true } : c)));
+    }
   };
 
-  // Control de Modales
-  const closeAllPopups = () => {
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    setIsLoggedIn(true);
+    setCurrentUser({ name: loginEmail.split('@')[0] || 'Usuario' });
     setIsLoginOpen(false);
+  };
+
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+    setIsLoggedIn(true);
+    setCurrentUser({ name: regName || 'Usuario' });
     setIsRegisterOpen(false);
   };
 
-  const handleOpenLogin = () => {
-    closeAllPopups();
-    setIsLoginOpen(true);
-  };
-
-  const handleOpenRegister = () => {
-    closeAllPopups();
-    setIsRegisterOpen(true);
-  };
-
-  // Simulación de Login (se extrae el nombre correctamente del correo)
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const email = formData.get('email') || '';
-
-    // Extraer nombre del correo; si no hay arroba o son solo números, asignar 'Explorador'
-    let username = email.includes('@') ? email.split('@')[0] : 'Explorador';
-    if (!username || /^\d+$/.test(username)) {
-      username = 'Explorador';
-    }
-
-    const user = { name: username, email: email };
-    setCurrentUser(user);
-    setIsLoggedIn(true);
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    closeAllPopups();
-  };
-
-  // Simulación de Registro
-  const handleRegisterSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const username = formData.get('username') || 'Explorador';
-    const email = formData.get('email') || '';
-
-    const user = { name: username, email: email };
-    setCurrentUser(user);
-    setIsLoggedIn(true);
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    closeAllPopups();
-  };
-
-  // Simulación de Logout
   const handleLogout = () => {
     setIsLoggedIn(false);
     setCurrentUser({ name: '' });
-    localStorage.removeItem('currentUser');
-  };
-
-  // Guardar o eliminar tarjeta de la bitácora
-  const handleBookmarkToggle = (card) => {
-    if (!isLoggedIn) return;
-
-    const isAlreadySaved = savedArticles.some((item) => item.id === card.id);
-    let updatedSaved;
-
-    if (isAlreadySaved) {
-      updatedSaved = savedArticles.filter((item) => item.id !== card.id);
-    } else {
-      updatedSaved = [card, ...savedArticles];
-    }
-
-    setSavedArticles(updatedSaved);
-    localStorage.setItem('savedArticles', JSON.stringify(updatedSaved));
-  };
-
-  // Eliminar tarjeta directamente desde la página /saved-cards
-  const handleDeleteSavedCard = (cardId) => {
-    const updated = savedArticles.filter((item) => item.id !== cardId);
-    setSavedArticles(updated);
-    localStorage.setItem('savedArticles', JSON.stringify(updated));
   };
 
   return (
     <div className="page">
       <Header
         isLoggedIn={isLoggedIn}
+        onLoginClick={() => setIsLoginOpen(true)}
+        onLogout={handleLogout}
         currentUser={currentUser}
-        onLoginClick={handleOpenLogin}
-        onLogoutClick={handleLogout}
       />
 
       <Routes>
         <Route
           path="/"
           element={
-            <Main
-              onSearchSubmit={handleSearchSubmit}
-              articles={articles.slice(0, visibleCount)}
-              totalArticlesCount={articles.length}
-              visibleCount={visibleCount}
-              onShowMore={handleShowMore}
-              isLoading={isLoading}
-              isNotFound={isNotFound}
-              hasError={hasError}
-              isLoggedIn={isLoggedIn}
-              savedArticles={savedArticles}
-              onBookmarkToggle={handleBookmarkToggle}
-            />
+            <main>
+              <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+              {isLoading && <Preloader />}
+              {!isLoading && hasSearched && cards.length === 0 && <NotFound />}
+              {!isLoading && cards.length > 0 && (
+                <CardsSection
+                  cards={cards}
+                  visibleCount={visibleCount}
+                  onShowMore={() => setVisibleCount((prev) => prev + CARDS_PER_PAGE)}
+                  onBookmarkClick={handleBookmarkClick}
+                  isLoggedIn={isLoggedIn}
+                />
+              )}
+              <About />
+            </main>
           }
         />
         <Route
           path="/saved-cards"
           element={
             <SavedCards
+              savedCards={savedCards}
               currentUser={currentUser}
-              savedArticles={savedArticles}
-              onDeleteCard={handleDeleteSavedCard}
+              onBookmarkClick={handleBookmarkClick}
             />
           }
         />
@@ -237,83 +135,73 @@ function App() {
 
       <Footer />
 
-      {/* Popup de Iniciar Sesión */}
       <PopupWithForm
         isOpen={isLoginOpen}
-        onClose={closeAllPopups}
+        onClose={() => setIsLoginOpen(false)}
         title="Iniciar sesión"
-        name="login"
-        buttonText="Inicia sesión"
-        redirectText="Regístrate"
-        onRedirectClick={handleOpenRegister}
+        buttonText="Iniciar sesión"
         onSubmit={handleLoginSubmit}
+        redirectText="Regístrate"
+        onRedirect={() => {
+          setIsLoginOpen(false);
+          setIsRegisterOpen(true);
+        }}
       >
-        <div className="popup__input-group">
-          <label className="popup__label">Correo electrónico</label>
-          <input
-            type="email"
-            name="email"
-            className="popup__input"
-            placeholder="Introduce tu correo electrónico"
-            required
-          />
-        </div>
-        <div className="popup__input-group">
-          <label className="popup__label">Contraseña</label>
-          <input
-            type="password"
-            name="password"
-            className="popup__input"
-            placeholder="Introduce tu contraseña"
-            required
-          />
-        </div>
+        <label htmlFor="login-email">Correo electrónico</label>
+        <input
+          id="login-email"
+          type="email"
+          required
+          value={loginEmail}
+          onChange={(e) => setLoginEmail(e.target.value)}
+        />
+        <label htmlFor="login-password">Contraseña</label>
+        <input
+          id="login-password"
+          type="password"
+          required
+          value={loginPass}
+          onChange={(e) => setLoginPass(e.target.value)}
+        />
       </PopupWithForm>
 
-      {/* Popup de Registro */}
       <PopupWithForm
         isOpen={isRegisterOpen}
-        onClose={closeAllPopups}
+        onClose={() => setIsRegisterOpen(false)}
         title="Inscribirse"
-        name="register"
         buttonText="Inscribirse"
-        redirectText="Iniciar sesión"
-        onRedirectClick={handleOpenLogin}
         onSubmit={handleRegisterSubmit}
+        redirectText="Iniciar sesión"
+        onRedirect={() => {
+          setIsRegisterOpen(false);
+          setIsLoginOpen(true);
+        }}
       >
-        <div className="popup__input-group">
-          <label className="popup__label">Correo electrónico</label>
-          <input
-            type="email"
-            name="email"
-            className="popup__input"
-            placeholder="Introduce tu correo electrónico"
-            required
-          />
-        </div>
-        <div className="popup__input-group">
-          <label className="popup__label">Contraseña</label>
-          <input
-            type="password"
-            name="password"
-            className="popup__input"
-            placeholder="Introduce tu contraseña"
-            required
-          />
-        </div>
-        <div className="popup__input-group">
-          <label className="popup__label">Nombre de usuario</label>
-          <input
-            type="text"
-            name="username"
-            className="popup__input"
-            placeholder="Introduce tu nombre de usuario"
-            required
-          />
-        </div>
+        <label htmlFor="reg-email">Correo electrónico</label>
+        <input
+          id="reg-email"
+          type="email"
+          required
+          value={regEmail}
+          onChange={(e) => setRegEmail(e.target.value)}
+        />
+        <label htmlFor="reg-password">Contraseña</label>
+        <input
+          id="reg-password"
+          type="password"
+          required
+          value={regPass}
+          onChange={(e) => setRegPass(e.target.value)}
+        />
+        <label htmlFor="reg-name">Nombre de usuario</label>
+        <input
+          id="reg-name"
+          type="text"
+          required
+          value={regName}
+          onChange={(e) => setRegName(e.target.value)}
+        />
       </PopupWithForm>
     </div>
   );
 }
-
-export default App;

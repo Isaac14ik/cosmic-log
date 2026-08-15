@@ -1,42 +1,37 @@
-import React from 'react';
 import Card from '../Card/Card';
 import './CardsSection.css';
 
-function CardsSection({
-  articles,
-  totalArticlesCount,
+export default function CardsSection({
+  cards,
   visibleCount,
   onShowMore,
-  isLoggedIn,
-  savedArticles = [],
-  onBookmarkToggle,
+  onBookmarkClick,
+  isLoggedIn
 }) {
-  const showMoreButton = visibleCount < totalArticlesCount;
-
   return (
     <section className="cards-section">
-      <h2 className="cards-section__title">Resultados de la búsqueda</h2>
-      <div className="cards-section__grid">
-        {articles.map((card) => {
-          const isSaved = savedArticles.some((item) => item.id === card.id);
-          return (
+      <div className="cards-section__container">
+        <h2 className="cards-section__title">Resultados de la búsqueda</h2>
+        <div className="cards-section__grid">
+          {cards.slice(0, visibleCount).map((card) => (
             <Card
               key={card.id}
               card={card}
+              onBookmarkClick={onBookmarkClick}
               isLoggedIn={isLoggedIn}
-              isSaved={isSaved}
-              onBookmarkToggle={onBookmarkToggle}
             />
-          );
-        })}
+          ))}
+        </div>
+        {visibleCount < cards.length && (
+          <button
+            type="button"
+            className="cards-section__more-button"
+            onClick={onShowMore}
+          >
+            Mostrar más
+          </button>
+        )}
       </div>
-      {showMoreButton && (
-        <button className="cards-section__more-button" onClick={onShowMore}>
-          Mostrar más
-        </button>
-      )}
     </section>
   );
 }
-
-export default CardsSection;
