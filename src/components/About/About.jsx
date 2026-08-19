@@ -1,23 +1,29 @@
+import authorImage from '../../images/YoMismo.jpeg'; 
 import './About.css';
 
 export default function About() {
   return (
     <section className="about">
       <div className="about__container">
-        <div className="about__image-container">
+        <div className="about__avatar-container">
           <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80"
+            src={authorImage}
             alt="Fotografía del autor"
-            className="about__image"
+            className="about__avatar"
           />
         </div>
-        <div className="about__content">
+        <div className="about__info">
           <h2 className="about__title">Acerca del autor</h2>
-          <p className="about__text">
-            ¡Hola! Soy un desarrollador enfocado en crear aplicaciones web modernas, eficientes y adaptables usando tecnologías como React, JavaScript y CSS semántico.
+          <p className="about__paragraph">
+            ¡Hola! Soy Jorge, desarrollador Web Full Stack con pasión por crear
+            interfaces limpias, intuitivas y eficientes. Este proyecto utiliza
+            tecnologías como React, JavaScript, HTML5, CSS3 y Vite para consumir
+            APIs de noticias en tiempo real.
           </p>
-          <p className="about__text">
-            Este proyecto forma parte de mi portafolio profesional en TripleTen, integrando consultas a APIs externas de la industria aeroespacial y gestión avanzada de interfaz.
+          <p className="about__paragraph">
+            A través de mi formación en desarrollo web, he aprendido a construir
+            aplicaciones adaptables (responsive) y a gestionar estados complejos
+            garantizando siempre una excelente experiencia de usuario.
           </p>
         </div>
       </div>

@@ -1,55 +1,26 @@
-import { NavLink, Link } from 'react_router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import Navigation from '../Navigation/Navigation';
 import './Header.css';
 
-export default function Header({ isLoggedIn, onLoginClick, onLogout, currentUser }) {
+export default function Header({ isLoggedIn, currentUser, onOpenPopup, onLogout }) {
+  const location = useLocation();
+  const isSavedNews = location.pathname === '/saved-cards';
+
   return (
-    <header className="header">
+    <header className={`header ${isSavedNews ? 'header_theme_light' : ''}`}>
       <div className="header__container">
-        <Link to="/" className="header__logo">
+        <Link
+          to="/"
+          className={`header__logo ${isSavedNews ? 'header__logo_theme_light' : ''}`}
+        >
           Cosmic Log
         </Link>
-        <nav className="header__nav">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `header__link ${isActive ? 'header__link_active' : ''}`
-            }
-          >
-            Inicio
-          </NavLink>
-          {isLoggedIn ? (
-            <>
-              <NavLink
-                to="/saved-cards"
-                className={({ isActive }) =>
-                  `header__link ${isActive ? 'header__link_active' : ''}`
-                }
-              >
-                Artículos guardados
-              </NavLink>
-              <button
-                type="button"
-                className="header__button header__button_logout"
-                onClick={onLogout}
-              >
-                {currentUser?.name || 'Usuario'}
-                <svg className="header__logout-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              className="header__button header__button_login"
-              onClick={onLoginClick}
-            >
-              Iniciar sesión
-            </button>
-          )}
-        </nav>
+        <Navigation
+          isLoggedIn={isLoggedIn}
+          currentUser={currentUser}
+          onOpenPopup={onOpenPopup}
+          onLogout={onLogout}
+        />
       </div>
     </header>
   );

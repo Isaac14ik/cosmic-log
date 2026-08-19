@@ -1,56 +1,49 @@
-import React from 'react';
 import SearchForm from '../SearchForm/SearchForm';
 import CardsSection from '../CardsSection/CardsSection';
+import About from '../About/About';
 import Preloader from '../Preloader/Preloader';
 import NotFound from '../NotFound/NotFound';
-import About from '../About/About';
-import './Main.css';
 
-function Main({
-  onSearchSubmit,
-  articles,
-  totalArticlesCount,
-  visibleCount,
-  onShowMore,
+export default function Main({
+  onSearch,
   isLoading,
-  isNotFound,
-  hasError,
+  apiError,
+  hasSearched,
+  cards,
+  visibleCount,
+  savedCards,
   isLoggedIn,
-  savedArticles,
-  onBookmarkToggle,
+  onShowMore,
+  onSaveCard,
+  onOpenPopup,
 }) {
   return (
-    <main className="main">
-      <section className="hero">
-        <div className="hero__content">
-          <h1 className="hero__title">¿Qué quieres explorar hoy?</h1>
-          <p className="hero__subtitle">
-            Encuentra las últimas novedades sobre el espacio, estrellas y galaxias.
-          </p>
-          <SearchForm onSearchSubmit={onSearchSubmit} />
-        </div>
-      </section>
+    <main className="content">
+      <SearchForm onSearch={onSearch} />
 
       {isLoading && <Preloader />}
-      {isNotFound && !isLoading && <NotFound />}
-      {hasError && !isLoading && (
-        <div className="main__error-message">
-          <p>
-            Lo sentimos, algo ha salido mal durante la solicitud. Es posible que haya un problema
-            de conexión o que el servidor no funcione. Por favor, inténtalo más tarde.
+
+      {apiError && (
+        <section className="results-error">
+          <p className="results-error__text">
+            Lo sentimos, pero ha ocurrido un error durante la solicitud. Es posible que haya un problema con la conexión o que el servidor no funcione. Por favor, inténtalo más tarde.
           </p>
-        </div>
+        </section>
       )}
 
-      {!isLoading && !isNotFound && !hasError && articles.length > 0 && (
+      {!isLoading && !apiError && hasSearched && cards.length === 0 && (
+        <NotFound />
+      )}
+
+      {!isLoading && !apiError && cards.length > 0 && (
         <CardsSection
-          articles={articles}
-          totalArticlesCount={totalArticlesCount}
-          visibleCount={visibleCount}
-          onShowMore={onShowMore}
+          cards={cards.slice(0, visibleCount)}
+          savedCards={savedCards}
           isLoggedIn={isLoggedIn}
-          savedArticles={savedArticles}
-          onBookmarkToggle={onBookmarkToggle}
+          onShowMore={onShowMore}
+          hasMoreCards={visibleCount < cards.length}
+          onSaveCard={onSaveCard}
+          onOpenPopup={onOpenPopup}
         />
       )}
 
@@ -58,5 +51,3 @@ function Main({
     </main>
   );
 }
-
-export default Main;

@@ -1,9 +1,11 @@
+import { API_BASE_URL, API_KEY } from './constants';
+
 class ThirdPartyApi {
-  constructor({ baseUrl }) {
+  constructor({ baseUrl, apiKey }) {
     this._baseUrl = baseUrl;
+    this._apiKey = apiKey;
   }
 
-  // Método privado para verificar si la respuesta del servidor es OK
   _checkResponse(res) {
     if (res.ok) {
       return res.json();
@@ -11,21 +13,22 @@ class ThirdPartyApi {
     return Promise.reject(`Error: ${res.status}`);
   }
 
-  // Método para buscar artículos / noticias espaciales por término
   searchArticles(keyword) {
-    const url = `${this._baseUrl}/articles/?search=${encodeURIComponent(keyword)}&limit=15`;
-    return fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(this._checkResponse);
+    // Para evitar que fechas futuras o desfasadas provoquen un Error 401 en el proxy,
+    // enviamos la consulta limpia de término y apiKey que el proxy de TripleTen procesa directamente.
+    const params = new URLSearchParams({
+      q: keyword,
+      pageSize: '100',
+      apiKey: this._apiKey,
+    });
+
+    return fetch(`${this._baseUrl}?${params.toString()}`).then(this._checkResponse);
   }
 }
 
-// Instanciamos la API con la URL base del servicio de noticias del espacio
 const thirdPartyApi = new ThirdPartyApi({
-  baseUrl: 'https://api.spaceflightnewsapi.net/v4',
+  baseUrl: API_BASE_URL,
+  apiKey: API_KEY,
 });
 
 export default thirdPartyApi;
