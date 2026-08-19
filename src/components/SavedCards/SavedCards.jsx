@@ -2,31 +2,35 @@ import SavedCardsHeader from '../SavedCardsHeader/SavedCardsHeader';
 import Card from '../Card/Card';
 import './SavedCards.css';
 
-export default function SavedCards({ savedCards, currentUser, onBookmarkClick }) {
-  const keywords = [...new Set(savedCards.map((c) => c.keyword || 'Espacio'))];
-
+export default function SavedCards({
+  savedCards = [],
+  isLoggedIn,
+  onDeleteCard,
+}) {
   return (
-    <main className="saved-cards">
-      <SavedCardsHeader
-        currentUser={currentUser}
-        savedCount={savedCards.length}
-        keywords={keywords}
-      />
-      <section className="saved-cards__content">
-        <div className="saved-cards__container">
+    <section className="saved-cards">
+      <SavedCardsHeader savedCards={savedCards} />
+
+      <div className="saved-cards__container">
+        {savedCards.length > 0 ? (
           <div className="saved-cards__grid">
-            {savedCards.map((card) => (
+            {savedCards.map((card, index) => (
               <Card
-                key={card.id}
+                key={card.id || card.link || index}
                 card={card}
-                onBookmarkClick={onBookmarkClick}
-                isLoggedIn={true}
-                isSavedPage={true}
+                savedCards={savedCards}
+                isLoggedIn={isLoggedIn}
+                isSavedNewsPage={true}
+                onDeleteCard={onDeleteCard}
               />
             ))}
           </div>
-        </div>
-      </section>
-    </main>
+        ) : (
+          <p className="saved-cards__empty">
+            Aún no has guardado ningún artículo.
+          </p>
+        )}
+      </div>
+    </section>
   );
 }

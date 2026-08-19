@@ -1,50 +1,53 @@
-
-import { NavLink } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './Navigation.css';
 
-function Navigation({ isLoggedIn, currentUser, onLoginClick, onLogoutClick }) {
+export default function Navigation({ isLoggedIn, currentUser, onOpenPopup, onLogout }) {
+  const location = useLocation();
+  const isSavedNews = location.pathname === '/saved-cards';
+
+  const handleAuthClick = () => {
+    if (isLoggedIn) {
+      onLogout();
+    } else {
+      onOpenPopup({
+        title: 'Iniciar sesión',
+        buttonText: 'Iniciar sesión',
+        type: 'login'
+      });
+    }
+  };
+
   return (
     <nav className="navigation">
-      <NavLink
+      <Link
         to="/"
-        className={({ isActive }) =>
-          `navigation__link ${isActive ? 'navigation__link_active' : ''}`
-        }
+        className={`navigation__link ${
+          !isSavedNews ? 'navigation__link_active' : ''
+        } ${isSavedNews ? 'navigation__link_theme_light' : ''}`}
       >
         Inicio
-      </NavLink>
+      </Link>
 
       {isLoggedIn && (
-        <NavLink
+        <Link
           to="/saved-cards"
-          className={({ isActive }) =>
-            `navigation__link ${isActive ? 'navigation__link_active' : ''}`
-          }
+          className={`navigation__link ${
+            isSavedNews ? 'navigation__link_active' : ''
+          } ${isSavedNews ? 'navigation__link_theme_light' : ''}`}
         >
-          Bitácora
-        </NavLink>
+          Artículos guardados
+        </Link>
       )}
 
-      {isLoggedIn ? (
-        <button
-          type="button"
-          className="navigation__button navigation__button_user"
-          onClick={onLogoutClick}
-        >
-          <span>{currentUser.name}</span>
-          <span className="navigation__logout-icon">🚪</span>
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="navigation__button"
-          onClick={onLoginClick}
-        >
-          Iniciar sesión
-        </button>
-      )}
+      <button
+        type="button"
+        className={`navigation__button ${
+          isSavedNews ? 'navigation__button_theme_light' : ''
+        }`}
+        onClick={handleAuthClick}
+      >
+        {isLoggedIn ? currentUser?.name || 'Usuario' : 'Iniciar sesión'}
+      </button>
     </nav>
   );
 }
-
-export default Navigation;

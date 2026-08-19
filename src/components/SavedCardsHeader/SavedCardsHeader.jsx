@@ -1,22 +1,32 @@
 import './SavedCardsHeader.css';
 
-export default function SavedCardsHeader({ currentUser, savedCount, keywords }) {
+export default function SavedCardsHeader({ savedCards = [] }) {
+  // Extraemos las fuentes únicas de las tarjetas guardadas
+  const sources = [
+    ...new Set(savedCards.map((card) => card.source?.name || card.source)),
+  ].filter(Boolean);
+
+  const getKeywordsText = () => {
+    if (sources.length === 0) return 'Ninguna';
+    if (sources.length === 1) return sources[0];
+    if (sources.length === 2) return `${sources[0]} y ${sources[1]}`;
+    return `${sources[0]}, ${sources[1]} y ${sources.length - 2} más`;
+  };
+
   return (
-    <section className="saved-cards-header">
+    <header className="saved-cards-header">
       <div className="saved-cards-header__container">
         <p className="saved-cards-header__subtitle">Artículos guardados</p>
         <h1 className="saved-cards-header__title">
-          {currentUser?.name || 'Usuario'}, tienes {savedCount} artículos guardados
+          Usuario, tienes {savedCards.length} artículos guardados
         </h1>
-        {keywords.length > 0 && (
-          <p className="saved-cards-header__keywords">
-            Por palabras clave:{' '}
-            <span className="saved-cards-header__keywords-bold">
-              {keywords.join(', ')}
-            </span>
-          </p>
-        )}
+        <p className="saved-cards-header__keywords">
+          Por palabras clave:{' '}
+          <span className="saved-cards-header__keywords-bold">
+            {getKeywordsText()}
+          </span>
+        </p>
       </div>
-    </section>
+    </header>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import './PopupWithForm.css';
 
 export default function PopupWithForm({
@@ -8,56 +8,93 @@ export default function PopupWithForm({
   children,
   buttonText,
   onSubmit,
-  redirectText,
-  onRedirect,
-  errorMessage,
+  onToggleForm,
+  type,
 }) {
-  useEffect(() => {
-    if (!isOpen) return;
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
 
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Enviamos los datos capturados al handler de App
+    onSubmit({ email, password, name });
+  };
 
   return (
-    <div className="popup" onClick={onClose}>
-      <div className="popup__container" onClick={(e) => e.stopPropagation()}>
+    <div className={`popup ${isOpen ? 'popup_opened' : ''}`}>
+      <div className="popup__container">
         <button
           type="button"
-          className="popup__close"
+          className="popup__close-button"
           onClick={onClose}
           aria-label="Cerrar modal"
         >
-          &times;
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
         <h2 className="popup__title">{title}</h2>
-        <form className="popup__form" onSubmit={onSubmit} noValidate>
-          {children}
-          {errorMessage && (
-            <span className="popup__error-message">{errorMessage}</span>
+        <form className="popup__form" onSubmit={handleSubmit}>
+          {children || (
+            <>
+              <label className="popup__label">
+                Correo electrónico
+                <input
+                  type="email"
+                  className="popup__input"
+                  placeholder="Introduce tu correo electrónico"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </label>
+              <label className="popup__label">
+                Contraseña
+                <input
+                  type="password"
+                  className="popup__input"
+                  placeholder="Introduce tu contraseña"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </label>
+              {type === 'register' && (
+                <label className="popup__label">
+                  Nombre
+                  <input
+                    type="text"
+                    className="popup__input"
+                    placeholder="Introduce tu nombre"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </label>
+              )}
+            </>
           )}
-          <button type="submit" className="popup__submit">
-            {buttonText}
+          <button type="submit" className="popup__submit-button">
+            {buttonText || 'Guardar'}
           </button>
         </form>
-        {redirectText && (
-          <p className="popup__redirect">
-            o{' '}
-            <button
-              type="button"
-              className="popup__redirect-button"
-              onClick={onRedirect}
-            >
-              {redirectText}
-            </button>
-          </p>
-        )}
+        <p className="popup__redirect">
+          o{' '}
+          <span className="popup__redirect-link" onClick={onToggleForm}>
+            {type === 'login' ? 'Inscribirse' : 'Iniciar sesión'}
+          </span>
+        </p>
       </div>
     </div>
   );

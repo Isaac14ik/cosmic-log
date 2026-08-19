@@ -1,30 +1,29 @@
-import authorImage from '../../images/YoMismo.jpeg';
+import authorImage from '../../images/YoMismo.jpeg'; 
 import './About.css';
 
 export default function About() {
   return (
     <section className="about">
       <div className="about__container">
-        <div className="about__avatar-wrapper">
+        <div className="about__avatar-container">
           <img
             src={authorImage}
-            alt="Jorge Isaac Nava Hernandez"
+            alt="Fotografía del autor"
             className="about__avatar"
           />
         </div>
-        <div className="about__content">
-          <h2 className="about__title">
-            Acerca del autor: <span className="about__title-highlight">Jorge Isaac Nava Hernandez</span>
-          </h2>
-          <p className="about__description">
-            ¡Hola! Soy Jorge Isaac Nava Hernandez, un desarrollador enfocado en crear aplicaciones web
-            modernas, eficientes y adaptables usando tecnologías como <strong>React</strong>, 
-            <strong> JavaScript</strong> y <strong>CSS semántico</strong>.
+        <div className="about__info">
+          <h2 className="about__title">Acerca del autor</h2>
+          <p className="about__paragraph">
+            ¡Hola! Soy Jorge, desarrollador Web Full Stack con pasión por crear
+            interfaces limpias, intuitivas y eficientes. Este proyecto utiliza
+            tecnologías como React, JavaScript, HTML5, CSS3 y Vite para consumir
+            APIs de noticias en tiempo real.
           </p>
-          <p className="about__description">
-            Este proyecto, <strong>Cosmic Log</strong>, forma parte de mi portafolio profesional en
-            TripleTen, integrando consultas a APIs externas de la industria aeroespacial y
-            gestión avanzada de interfaz.
+          <p className="about__paragraph">
+            A través de mi formación en desarrollo web, he aprendido a construir
+            aplicaciones adaptables (responsive) y a gestionar estados complejos
+            garantizando siempre una excelente experiencia de usuario.
           </p>
         </div>
       </div>
